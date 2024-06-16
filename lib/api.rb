@@ -26,12 +26,12 @@ module API
     }
   end
 
-  def self.payload(query: nil, take: 10, skip: 0) # rubocop:disable Metrics/MethodLength
+  def self.payload(query: nil, parameters: [], take: 10, skip: 0) # rubocop:disable Metrics/MethodLength
     {
       "FilterOptionsParameters" => {
         "IntersectionSearch" => true,
         "SearchText" => query || "",
-        "Parameters" => [],
+        "Parameters" => parameters,
       },
       "IncludeCount" => true,
       "PagingOptions" => {
@@ -50,6 +50,8 @@ module API
 
   # Handle the API fetch logic
   class Client
+    TAKE = 100
+
     def initialize
       @cookie_jar = HTTP::CookieJar.new
       @xsrf_token = nil
@@ -57,8 +59,25 @@ module API
       setup_session
     end
 
-    def request(mod = MODULES[0], payload = API.payload(), headers = {})
+    def fetch_records(mod: MODULES[0])
+      records = []
+
+      loop do
+        response = request mod: mod, take: TAKE, skip: records.size
+        json_response = JSON.parse response
+        records.concat json_response[mod]
+
+        break if json_response[mod].size < TAKE
+      end
+
+      records
+    end
+
+    private
+
+    def request(mod: MODULES[0], take: 10, skip: 0, headers: {})
       request_url = BASE_URL + "#{mod}/#{AGENCY_ID}"
+      payload = API.payload(take: take, skip: skip)
       response = Net::HTTP.post(request_url, payload, merge_headers(headers))
 
       raise "Request failed with code #{response.code}" unless response.is_a?(Net::HTTPSuccess)
@@ -67,8 +86,6 @@ module API
 
       Zlib::GzipReader.new(StringIO.new(response.body)).read
     end
-
-    private
 
     def setup_session
       response = Net::HTTP.get_response(BASE_URL)
