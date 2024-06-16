@@ -44,16 +44,23 @@ class RecentArrestRecord < Hash
   end
 
   def to_csv_lines
-    @charges.map do |charge|
+    return [to_csv_line] if @charges.empty?
+
+    @charges.map { |c| to_csv_line charge: c }
+  end
+
+  private
+
+  def to_csv_line(charge: nil)
       # values_at fills in nil for missing keys
       line = values_at(*CSV_HEADERS)
 
-      line[CSV_HEADERS.index("ImageUrl")] = @image_url
+      unless charge.nil?
       line[CSV_HEADERS.index("ChargeDescription")] = charge["Description"]
       line[CSV_HEADERS.index("ChargeBondAmount")] = charge["BondAmount"]
       line[CSV_HEADERS.index("ChargeBondType")] = charge["BondType"]
-
-      line.map { |value| value == "" ? nil : value }
     end
+
+    line.map { |value| value == "" ? nil : value }
   end
 end
