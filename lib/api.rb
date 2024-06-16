@@ -48,6 +48,10 @@ module API
     }.to_json
   end
 
+  def self.image_url(image_id, mod: MODULES[0])
+    BASE_URL + "#{mod}/Image/#{AGENCY_ID}/#{image_id}"
+  end
+
   # Handle the API fetch logic
   class Client
     TAKE = 100
