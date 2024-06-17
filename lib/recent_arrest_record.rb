@@ -35,12 +35,27 @@ class RecentArrestRecord < Hash
     "Properties",
   ].freeze
 
+  attr_writer :image_url, :charges
+
   def initialize(record)
     super
     merge!(record)
 
+    # We want values_at to fill in nil for missing keys
+    self.default = nil
+
     @charges = record["Charges"]
     @image_url = API.image_url(record["ImageId"])
+  end
+
+  def id
+    self["Id"]&.to_i
+  end
+
+  def <=>(other)
+    return unless other.is_a? RecentArrestRecord
+
+    self["Id"] <=> other["Id"]
   end
 
   def to_csv_lines
@@ -52,10 +67,10 @@ class RecentArrestRecord < Hash
   private
 
   def to_csv_line(charge: nil)
-      # values_at fills in nil for missing keys
-      line = values_at(*CSV_HEADERS)
+    line = values_at(*CSV_HEADERS)
 
-      unless charge.nil?
+    line[CSV_HEADERS.index("ImageUrl")] = @image_url
+    unless charge.nil?
       line[CSV_HEADERS.index("ChargeDescription")] = charge["Description"]
       line[CSV_HEADERS.index("ChargeBondAmount")] = charge["BondAmount"]
       line[CSV_HEADERS.index("ChargeBondType")] = charge["BondType"]

@@ -2,6 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     ast (2.4.2)
+    csv (3.3.0)
     domain_name (0.6.20240107)
     http-cookie (1.0.6)
       domain_name (~> 0.5)
@@ -38,6 +39,7 @@ PLATFORMS
   arm64-darwin-23
 
 DEPENDENCIES
+  csv
   http-cookie
   rake
   rubocop

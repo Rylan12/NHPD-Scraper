@@ -2,6 +2,7 @@
 
 source "https://rubygems.org"
 
+gem "csv"
 gem "http-cookie"
 gem "rake"
 gem "uri"
