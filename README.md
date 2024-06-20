@@ -9,16 +9,46 @@ A link to the raw CSV file can be found [here](https://raw.githubusercontent.com
 
 ## Usage
 
-To update the data, run the following command:
+First, install the required gems:
 
-```console
-$ rake
-Received 568 records from the API.
-Wrote JSON output to json/20240616T203021.json.
-Read 568 records from json/20240616T203021.json.
-Wrote CSV output to data/arrests.csv.
+```bash
+bundle install
 ```
 
-> [!NOTE]
-> Running this command will overwrite the existing data in `data/arrests.csv`, so any data that is not in the new API response will be lost.
-> This means that arrests from more than 1 month ago will be gone (they will still exist in source control, of course).
+To update the CSV file, run the following command:
+
+```console
+$ bundle exec rake update
+Received 574 records from the API.
+Updated database with 7 new records and 5 modified records.
+```
+
+### Separate Fetch and Dump
+
+To download the latest JSON data from the API, run the following command which will place a JSON file in the `json` directory:
+
+```console
+$ bundle exec rake fetch
+Received 574 records from the API.
+Wrote JSON output to json/20240620T123308.json.
+```
+
+To dump the JSON data from the most recent fetch to the CSV file, run the following command:
+
+```console
+$ bundle exec rake dump
+Read 574 records from json/20240620T123308.json.
+Updated database with 7 new records and 5 modified records.
+```
+
+## Development
+
+Before submitting changes, run the following command to ensure that the code is formatted correctly:
+
+```console
+$ bundle exec rubocop
+Inspecting 6 files
+......
+
+6 files inspected, no offenses detected
+```
