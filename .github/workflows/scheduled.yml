@@ -1,0 +1,57 @@
+name: Scheduled
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  schedule:
+    # Run every day at midnight
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-database:
+    name: Update database
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        bundler-cache: true
+
+    - name: Update database
+      id: update
+      run: |
+        # We do it this way to preserve multiline output
+        {
+          echo 'rake-output<<EOF'
+          bundle exec rake update
+          echo EOF
+        } >> "$GITHUB_OUTPUT"
+
+    - name: Commit database changes
+      if: github.ref == 'refs/heads/main'
+      run: |
+        git add data/arrests.json
+        if ! git diff --no-patch --exit-code HEAD -- data/arrests.json; then
+          git commit -m "Update arrests database" data/arrests.json \
+                     -m "${{ steps.update.outputs.rake-output }}" \
+                     -m "This commit was generated automatically by a scheduled workflow."
+        fi
+
+    - name: Push changes
+      if: github.ref == 'refs/heads/main'
+      # TODO: make this actually push
+      run: git show
+
+    - name: Update job summary
+      run: |
+        # Use awk to replace "\n" with "<br>" so markdown will render it as a newline
+        echo "### Update Database" >> "$GITHUB_STEP_SUMMARY"
+        echo "${{ steps.update.outputs.rake-output }}" | awk 1 ORS="<br>" >> "$GITHUB_STEP_SUMMARY"
