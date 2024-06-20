@@ -38,9 +38,9 @@ jobs:
     - name: Commit database changes
       if: github.ref == 'refs/heads/main'
       run: |
-        git add data/arrests.json
-        if ! git diff --no-patch --exit-code HEAD -- data/arrests.json; then
-          git commit -m "Update arrests database" data/arrests.json \
+        git add data/arrests.csv
+        if ! git diff --no-patch --exit-code HEAD -- data/arrests.csv; then
+          git commit -m "Update arrests database" data/arrests.csv \
                      -m "${{ steps.update.outputs.rake-output }}" \
                      -m "This commit was generated automatically by a scheduled workflow."
         fi
