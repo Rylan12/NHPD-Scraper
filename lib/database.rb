@@ -3,7 +3,7 @@
 require "csv"
 require "pathname"
 
-require_relative "recent_arrest_record"
+require_relative "record"
 
 # Handle processing of arrest records into CSV format
 class Database
@@ -16,28 +16,19 @@ class Database
 
     return unless @file.exist?
 
-    @table = CSV.read(file, headers: true)
-    @ids = @table.values_at("Id").uniq
-
-    populate_records
+    table = CSV.read(file, headers: true)
+    @ids = table.values_at("Id").uniq
+    @records = Records.from_csv_lines table.map(&:to_h)
   end
 
-  def create_csv(from_records)
-    from_records = from_records.map { |record| RecentArrestRecord.new(record) }
+  def update!(new_json_records)
+    new_records = Records.from_api_response new_json_records
 
-    CSV.open(file, "w", headers: RecentArrestRecord::CSV_HEADERS, write_headers: true) do |csv|
-      from_records.each do |record|
-        record.to_csv_lines.each { |line| csv << line }
-      end
-    end
+    @records.merge! new_records
   end
 
-  private
-
-  def populate_records
-    grouped_records = @table.group_by { |row| row["Id"] }
-    @records = grouped_records.values.map do |rows|
-      RecentArrestRecord.from_csv_lines rows.map(&:to_h)
-    end
+  def write!(file = @file)
+    table = CSV::Table.new @records.to_csv_rows
+    File.write file, table.to_csv
   end
 end

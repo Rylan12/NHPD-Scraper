@@ -67,7 +67,7 @@ module API
       records = []
 
       loop do
-        response = request mod: mod, take: TAKE, skip: records.size
+        response = request mod:, take: TAKE, skip: records.size
         json_response = JSON.parse response
         records.concat json_response[mod]
 
@@ -81,7 +81,7 @@ module API
 
     def request(mod: MODULES[0], take: 10, skip: 0, headers: {})
       request_url = BASE_URL + "#{mod}/#{AGENCY_ID}"
-      payload = API.payload(take: take, skip: skip)
+      payload = API.payload(take:, skip:)
       response = Net::HTTP.post(request_url, payload, merge_headers(headers))
 
       raise "Request failed with code #{response.code}" unless response.is_a?(Net::HTTPSuccess)
