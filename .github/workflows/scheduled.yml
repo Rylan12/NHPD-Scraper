@@ -52,11 +52,9 @@ jobs:
 
     - name: Push changes
       if: github.ref == 'refs/heads/main'
-      # TODO: make this actually push
-      run: git show
+      run: git push
 
     - name: Update job summary
       run: |
         # Use awk to replace "\n" with "<br>" so markdown will render it as a newline
-        echo "### Update Database" >> "$GITHUB_STEP_SUMMARY"
         echo "${{ steps.update.outputs.rake-output }}" | awk 1 ORS="<br>" >> "$GITHUB_STEP_SUMMARY"
