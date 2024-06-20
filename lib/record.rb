@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "csv"
+require "tzinfo"
 
 require_relative "api"
 require_relative "charge"
@@ -135,7 +136,7 @@ class Record
   end
 
   def last_updated
-    @last_updated ||= @contents["LastUpdated"] || Time.now
+    @last_updated ||= @contents["LastUpdated"] || current_time
   end
 
   # Take everything from the new record
@@ -148,7 +149,7 @@ class Record
 
     @image_url = other.image_url
     @charges = other.charges
-    @last_updated = Time.now
+    @last_updated = current_time
 
     @contents
   end
@@ -208,6 +209,13 @@ class Record
       # Return the value or nil if the value is the empty string
       @contents[header] == "" ? nil : @contents[header]
     end
+  end
+
+  def current_time
+    # Always use the US/Eastern timezone for consistency (this is important for running on GitHub actions).
+    # Format the time like "2024-06-20T15:14:52-04:00" to match the format returned by the API
+    @tz ||= TZInfo::Timezone.get("US/Eastern")
+    @tz.to_local(Time.now).strftime("%Y-%m-%dT%H:%M:%S%:z")
   end
 
   # Pass everything through to the underlying array

@@ -4,6 +4,7 @@ source "https://rubygems.org"
 
 gem "csv"
 gem "http-cookie"
+gem "tzinfo"
 gem "uri"
 gem "zlib"
 
