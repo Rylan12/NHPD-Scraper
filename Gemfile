@@ -9,3 +9,4 @@ gem "uri"
 gem "zlib"
 
 gem "rubocop", require: false
+gem "rubocop-rake", require: false

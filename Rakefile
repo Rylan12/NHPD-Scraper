@@ -7,6 +7,7 @@ JSON_DIRECTORY = Pathname("json")
 
 task default: %w[update]
 
+desc "Update the database with the latest records from the API"
 task :update do
   require_relative "lib/api"
   require_relative "lib/database"
@@ -23,6 +24,7 @@ task :update do
   puts "Updated database with {added} new records and {modified} changed records."
 end
 
+desc "Fetch the latest records from the API to a JSON file"
 task :fetch do
   require_relative "lib/api"
   FileUtils.mkdir_p JSON_DIRECTORY
@@ -38,6 +40,7 @@ task :fetch do
   puts "Wrote JSON output to #{output_file}."
 end
 
+desc "Dump the latest JSON file into the database"
 task :dump do
   require_relative "lib/database"
 
@@ -53,6 +56,7 @@ task :dump do
   puts "Updated database with {added} new records and {modified} changed records."
 end
 
+desc "Remove previously created JSON files"
 task :clean do
   # Remove all JSON files in the json directory
   JSON_DIRECTORY.glob("*.json").each(&:delete)
