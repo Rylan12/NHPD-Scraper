@@ -35,6 +35,11 @@ jobs:
           echo EOF
         } >> "$GITHUB_OUTPUT"
 
+    - name: Set up committer
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
     - name: Commit database changes
       if: github.ref == 'refs/heads/main'
       run: |
