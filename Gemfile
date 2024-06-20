@@ -4,9 +4,10 @@ source "https://rubygems.org"
 
 gem "csv"
 gem "http-cookie"
-gem "rake"
 gem "uri"
 gem "zlib"
+
+gem "rake"
 
 gem "rubocop", require: false
 gem "rubocop-rake", require: false
