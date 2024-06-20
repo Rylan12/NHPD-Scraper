@@ -36,7 +36,7 @@ GEM
     ruby-progressbar (1.13.0)
     strscan (3.1.0)
     unicode-display_width (2.5.0)
-    uri (0.12.1)
+    uri (0.13.0)
     zlib (3.1.1)
 
 PLATFORMS
