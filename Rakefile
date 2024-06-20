@@ -18,10 +18,10 @@ task :update do
   puts "Received #{records.size} records from the API."
 
   db = Database.new
-  db.update! records
+  added, modified = db.update! records
   db.write!
 
-  puts "Updated database with {added} new records and {modified} changed records."
+  puts "Updated database with #{added} new records and #{modified} modified records."
 end
 
 desc "Fetch the latest records from the API to a JSON file"
@@ -50,10 +50,10 @@ task :dump do
   puts "Read #{records.size} records from #{input_file}."
 
   db = Database.new
-  db.update! records
+  added, modified = db.update! records
   db.write!
 
-  puts "Updated database with {added} new records and {modified} changed records."
+  puts "Updated database with #{added} new records and #{modified} modified records."
 end
 
 desc "Remove previously created JSON files"

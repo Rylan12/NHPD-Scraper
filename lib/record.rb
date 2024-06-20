@@ -25,15 +25,18 @@ class Records
   end
 
   def merge!(other)
+    @added = 0
+    @modified = 0
+
     other.each do |record|
-      existing = @contents.find { |r| r.id == record.id }
-      if existing
-        existing.merge! record
+      if (existing = @contents.find { |r| r.id == record.id })
+        merge_records existing, record
       else
-        push record
+        add_record record
       end
     end
-    self
+
+    [@added, @modified]
   end
 
   def to_csv_rows
@@ -42,6 +45,20 @@ class Records
         CSV::Row.new Record::CSV_HEADERS, line
       end
     end
+  end
+
+  private
+
+  def merge_records(existing, new_record)
+    return unless existing.needs_update? new_record
+
+    existing.merge! new_record
+    @modified += 1
+  end
+
+  def add_record(record)
+    @contents.push record
+    @added += 1
   end
 
   # Pass everything through to the underlying array
@@ -148,17 +165,6 @@ class Record
     @charges.sort.map { |c| to_csv_array charge: c }
   end
 
-  private
-
-  def convert_type(header, value)
-    return value.to_i if header == "Id"
-    return value.to_f if %w[TotalBondAmount ChargeBondAmount].include?(header)
-    return value.to_s if %w[Vehicles Properties].include?(header)
-    return nil if value == ""
-
-    value
-  end
-
   # Items are equal if everything matches, but it's okay if one has ImageId and one uses ImageUrl.
   # Also, compare charges using Charge comparison logic and don't depend on the Charge* fields.
   def needs_update?(other)
@@ -175,6 +181,17 @@ class Record
         @contents[key] != other[key]
       end
     end
+  end
+
+  private
+
+  def convert_type(header, value)
+    return value.to_i if header == "Id"
+    return value.to_f if %w[TotalBondAmount ChargeBondAmount].include?(header)
+    return value.to_s if %w[Vehicles Properties].include?(header)
+    return nil if value == ""
+
+    value
   end
 
   def to_csv_array(charge: nil)
