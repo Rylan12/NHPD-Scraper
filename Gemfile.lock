@@ -35,7 +35,7 @@ GEM
     ruby-progressbar (1.13.0)
     unicode-display_width (2.5.0)
     uri (0.12.1)
-    zlib (3.0.0)
+    zlib (3.1.1)
 
 PLATFORMS
   arm64-darwin-23
